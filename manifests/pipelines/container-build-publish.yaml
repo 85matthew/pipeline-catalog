@@ -1,0 +1,93 @@
+kind: Pipeline
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: container-build-publish-custodian
+spec:
+  workspaces:
+    - name: build-workspace
+#    - name: local-maven-repo
+  params:
+    - name: git-repo-url
+      type: string
+    - name: git-repo-revision
+      type: string
+      default: master
+    - name: container-repository
+      type: string
+  tasks:
+    - name: clone
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      workspaces:
+        - name: output
+          workspace: build-workspace
+      params:
+        - name: url
+          value: "$(params.git-repo-url)"
+        - name: revision
+          value: "$(params.git-repo-revision)"
+        - name: deleteExisting
+          value: "true"
+
+    - name: generate-gradle-build-id
+      taskRef:
+        kind: ClusterTask
+        name: gradle-build-id
+      runAfter:
+        - clone
+      workspaces:
+        - name: build-workspace
+          workspace: build-workspace
+
+    - name: build
+      taskRef:
+        kind: ClusterTask
+        name: gradle
+      runAfter:
+        - clone
+      params:
+        - name: TASK
+          value: "build"
+      workspaces:
+        - name: build-workspace
+          workspace: build-workspace
+
+    - name: run-tests
+      taskRef:
+        kind: ClusterTask
+        name: simple-bash-shell
+      runAfter:
+        - build
+      params:
+        - name: COMMAND
+          value: "echo 'Running application tests...'"
+      workspaces:
+        - name: build-workspace
+          workspace: build-workspace
+
+    - name: jar-publish-artifact
+      taskRef:
+        kind: ClusterTask
+        name: gradle
+      runAfter:
+        - run-tests
+      params:
+        - name: TASK
+          value: "clean build"
+      workspaces:
+        - name: build-workspace
+          workspace: build-workspace
+
+    - name: publish-container
+      taskRef:
+        kind: Task
+        name: buildah
+      runAfter:
+        - jar-publish-artifact
+      params:
+        - name: IMAGE
+          value: "$(params.container-repository):$(tasks.generate-gradle-build-id.results.build-id)"
+      workspaces:
+        - name: source
+          workspace: build-workspace

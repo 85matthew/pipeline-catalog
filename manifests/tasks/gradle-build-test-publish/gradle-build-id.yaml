@@ -1,0 +1,28 @@
+kind: ClusterTask
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: gradle-build-id
+  annotations:
+    description: |
+      A gradle task that prints the build-id
+spec:
+  results:
+    - name: build-id
+      description: gradle build id
+  workspaces:
+    - name: source
+      description: Build artifacts.
+      mountPath: /workspace/source
+  params:
+    - name: build-image
+      description:
+      type: string
+      default: "gradle:jdk11"
+  steps:
+    - name: gradle-build-id
+      image: $(params.build-image)
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/usr/bin/env bash
+        buildId=`./gradlew -q generateVersion | tr -d '[:cntrl:]'`
+        echo -n ${buildId} | tee $(results.build-id.path)

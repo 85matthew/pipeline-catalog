@@ -1,0 +1,7 @@
+# Specify the container where we want to push our container images
+- op: add
+  path: "spec/params/-"
+  value:
+    - name: container-image-repo
+      description: Name of the container image repo that pipeline will publish to
+      default: quay.io/85matthew/custodian

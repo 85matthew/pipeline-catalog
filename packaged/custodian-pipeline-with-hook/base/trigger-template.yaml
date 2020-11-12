@@ -1,0 +1,36 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: triggertemplate
+spec:
+  params:
+    - name: git-repo-url
+      description: The git repository url
+    - name: git-repo-revision
+      description: The git revision
+      default: master
+    - name: git-repo-name
+      description: The name of the deployment to be created / patched
+    - name: container-image-repo
+      description: The name of the deployment to be created / patched
+      default: quay.io/85matthew/custodian
+  resourcetemplates:
+    - kind: PipelineRun
+      apiVersion: tekton.dev/v1beta1
+      metadata:
+        name: build-$(params.git-repo-name)-$(uid)
+      spec:
+        serviceAccountName: $(SERVICEACCOUNT_NAME)
+        pipelineRef:
+          name: container-build-publish-custodian
+        params:
+          - name: git-repo-url
+            value: $(params.git-repo-url)
+          - name: git-repo-revision
+            value: $(params.git-repo-revision)
+          - name: container-repository
+            value: $(params.container-image-repo)
+        workspaces:
+          - name: build-workspace
+            persistentVolumeClaim:
+              claimName: build-workspace-pvc

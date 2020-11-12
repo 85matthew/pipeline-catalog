@@ -1,0 +1,30 @@
+kind: ClusterTask
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: gradle
+spec:
+  workspaces:
+    - name: build-workspace
+      description: Build artifacts.
+      mountPath: /workspace/source
+  params:
+    - name: TASK
+      description: The Gradle task to run
+      type: string
+      default: "build"
+    - name: ARGS
+      description:
+      type: string
+      default: ""
+    - name: gradle-image
+      description:
+      type: string
+      default: "gradle:jdk11"
+
+  steps:
+    - name: gradle-task
+      image: $(params.gradle-image)
+      workingDir: $(workspaces.build-workspace.path)
+      script: |
+        echo "Executing gradle" $(params.TASK)
+        gradle $(params.TASK) --no-daemon

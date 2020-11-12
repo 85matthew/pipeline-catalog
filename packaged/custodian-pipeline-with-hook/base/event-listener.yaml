@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: eventlistener
+spec:
+  serviceAccountName: $(SERVICEACCOUNT_NAME)
+  triggers:
+    - bindings:
+        - ref: $(TRIGGER_BINDING)
+      template:
+        name: $(TRIGGER_TEMPLATE)
