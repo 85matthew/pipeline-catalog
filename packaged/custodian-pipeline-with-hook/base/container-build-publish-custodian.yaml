@@ -1,1 +1,109 @@
-../../../manifests/pipelines/container-build-publish-custodian.yaml
+kind: Pipeline
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: container-build-publish-custodian
+spec:
+  workspaces:
+    - name: build-workspace
+  params:
+    - name: git-repo-url
+      type: string
+    - name: git-repo-revision
+      type: string
+      default: master
+    - name: container-repository
+      type: string
+    - name: quay-repository
+      type: string
+      default: quay.io/85matthew/custodian
+    - name: internal-repository
+      type: string
+      default: image-registry.openshift-image-registry.svc:5000/custodian/custodian
+
+  tasks:
+    - name: clone
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      workspaces:
+        - name: output
+          workspace: build-workspace
+      params:
+        - name: url
+          value: "$(params.git-repo-url)"
+        - name: revision
+          value: "$(params.git-repo-revision)"
+        - name: deleteExisting
+          value: "true"
+
+    - name: generate-gradle-build-id
+      taskRef:
+        kind: ClusterTask
+        name: gradle-build-id
+      runAfter:
+        - clone
+      workspaces:
+        - name: source
+          workspace: build-workspace
+
+    - name: build-container
+      taskRef:
+        kind: Task
+        name: buildah
+      runAfter:
+        - generate-gradle-build-id
+      params:
+        - name: IMAGE
+          value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
+        - name: TLSVERIFY
+          value: "false"
+      workspaces:
+        - name: source
+          workspace: build-workspace
+
+    - name: custodian-syntax-validation
+      taskRef:
+        kind: Task
+        name: custodian-task
+      runAfter:
+        - build-container
+      params:
+        - name: IMAGE
+          value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
+        - name: MODE
+          value: "validate"
+      workspaces:
+        - name: source
+          workspace: build-workspace
+
+    - name: custodian-dry-run
+      taskRef:
+        kind: Task
+        name: custodian-task
+      runAfter:
+        - custodian-syntax-validation
+      params:
+        - name: IMAGE
+          value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
+        - name: MODE
+          value: "dry-run"
+      workspaces:
+        - name: source
+          workspace: build-workspace
+
+    - name: publish-container-to-quay
+      taskRef:
+        kind: Task
+        name: push-image
+      runAfter:
+        - custodian-dry-run
+      params:
+        - name: src-image
+          value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
+        - name: dest-image
+          value: "$(params.quay-repository)"
+        - name: dest-tags
+          value: "$(tasks.generate-gradle-build-id.results.build-id)"
+      workspaces:
+        - name: source
+          workspace: build-workspace
