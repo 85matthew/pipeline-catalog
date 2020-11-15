@@ -45,4 +45,5 @@ resources:
   - workspace-build-pvc.yaml
   - serviceaccount.yaml
   - container-build-publish-custodian.yaml
+  - custodian-task.yaml
 #  - serviceaccount.yaml
