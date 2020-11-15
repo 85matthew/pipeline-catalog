@@ -49,7 +49,7 @@ spec:
 
     - name: build-container
       taskRef:
-        kind: Task
+        kind: ClusterTask
         name: buildah
       runAfter:
         - generate-gradle-build-id
