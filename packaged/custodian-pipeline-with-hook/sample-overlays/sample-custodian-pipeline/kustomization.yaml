@@ -1,0 +1,22 @@
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namePrefix: custodian-
+
+patches:
+  - path: container-repo-patch.yaml
+    target:
+      kind: TriggerTemplate
+      name: triggertemplate
+      version: triggers.tekton.dev/v1alpha1
+
+  - path: aws-iam-role-patch.yaml
+    target:
+      kind: ServiceAccount
+      name: pipeline
+      version: v1
+
+resources:
+  - ../base/
+
