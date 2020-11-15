@@ -44,4 +44,5 @@ resources:
   - trigger-template.yaml
   - workspace-build-pvc.yaml
   - serviceaccount.yaml
+  - container-build-publish-custodian.yaml
 #  - serviceaccount.yaml
