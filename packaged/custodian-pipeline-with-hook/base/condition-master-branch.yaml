@@ -1,0 +1,10 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Condition
+metadata:
+  name: compare-branch-to-master
+spec:
+  params:
+    - name: "branch"
+  check:
+    image: alpine
+    script: 'test $(params.branch) = refs/heads/main'

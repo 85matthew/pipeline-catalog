@@ -93,13 +93,20 @@ spec:
           workspace: build-workspace
 
     - name: publish-container-to-quay
-      when:
-        - input: "$(params.git-rep-branch)"
-          operator: in
-          values: ["refs/heads/main"]
+
+
+#      when:
+#        - input: "$(params.git-repo-branch)"
+#          operator: in
+#          values: ["refs/heads/main"]
       taskRef:
         kind: Task
         name: push-image
+      conditions:
+        - conditionRef: "compare-branch"
+          params:
+            - name: "branch"
+              value: "$(params.git-repo-branch)"
       runAfter:
         - custodian-dry-run
       params:
