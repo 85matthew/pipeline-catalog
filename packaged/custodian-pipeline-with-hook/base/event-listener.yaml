@@ -6,12 +6,7 @@ spec:
 
   serviceAccountName: $(SERVICEACCOUNT_NAME)
   triggers:
-    - name: tekton-eventlistener
-      interceptors:
-        - cel:
-            filter: >-
-              (header.match('X-GitHub-Event', 'push') && body.ref.startsWith('refs/heads/master'))
-      bindings:
+    - bindings:
         - ref: $(TRIGGER_BINDING)
       template:
         name: $(TRIGGER_TEMPLATE)

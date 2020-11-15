@@ -10,7 +10,8 @@ spec:
       type: string
     - name: git-repo-revision
       type: string
-      default: master
+    - name: git-repo-branch
+      type: string
     - name: container-repository
       type: string
     - name: quay-repository
@@ -92,6 +93,10 @@ spec:
           workspace: build-workspace
 
     - name: publish-container-to-quay
+      when:
+        - input: "$(params.git-rep-branch)"
+          operator: in
+          values: ["refs/heads/main"]
       taskRef:
         kind: Task
         name: push-image

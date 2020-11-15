@@ -11,6 +11,8 @@ spec:
       default: master
     - name: git-repo-name
       description: The name of the deployment to be created / patched
+    - name: git-repo-branch
+      description: branch name of the event ("refs/heads/main")
     - name: container-image-repo
       description: The name of the deployment to be created / patched
       default: quay.io/85matthew/custodian
@@ -28,6 +30,8 @@ spec:
             value: $(params.git-repo-url)
           - name: git-repo-revision
             value: $(params.git-repo-revision)
+          - name: git-repo-branch
+            value: $(params.git-repo-branch)
           - name: container-repository
             value: $(params.container-image-repo)
         workspaces:
