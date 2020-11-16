@@ -108,32 +108,32 @@ spec:
       workspaces:
         - name: source
           workspace: build-workspace
-          
 
-    - name: publish-container-to-quay-with-latest-tag
-
-
-        #      when:
-        #        - input: "$(params.git-repo-branch)"
-        #          operator: in
-        #          values: ["refs/heads/main"]
-        taskRef:
-          kind: Task
-          name: push-image
-        conditions:
-          - conditionRef: "compare-branch-to-master"
-            params:
-              - name: "branch"
-                value: "$(params.git-repo-branch)"
-        runAfter:
-          - custodian-dry-run
-        params:
-          - name: src-image
-            value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
-          - name: dest-image
-            value: "$(params.quay-repository)"
-          - name: dest-tags
-            value: "$(tasks.generate-gradle-build-id.results.build-id)"
-        workspaces:
-          - name: source
-            workspace: build-workspace
+#
+#    - name: publish-container-to-quay-with-latest-tag
+#
+#
+#        #      when:
+#        #        - input: "$(params.git-repo-branch)"
+#        #          operator: in
+#        #          values: ["refs/heads/main"]
+#        taskRef:
+#          kind: Task
+#          name: push-image
+#        conditions:
+#          - conditionRef: "compare-branch-to-master"
+#            params:
+#              - name: "branch"
+#                value: "$(params.git-repo-branch)"
+#        runAfter:
+#          - custodian-dry-run
+#        params:
+#          - name: src-image
+#            value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
+#          - name: dest-image
+#            value: "$(params.quay-repository)"
+#          - name: dest-tags
+#            value: "latest"
+#        workspaces:
+#          - name: source
+#            workspace: build-workspace
