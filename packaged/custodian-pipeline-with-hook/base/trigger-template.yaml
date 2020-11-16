@@ -16,6 +16,8 @@ spec:
     - name: container-image-repo
       description: The name of the deployment to be created / patched
       default: quay.io/85matthew/custodian
+    - name: internal-repository
+      default: image-registry.openshift-image-registry.svc:5000/custodian-cicd/custodian
   resourcetemplates:
     - kind: PipelineRun
       apiVersion: tekton.dev/v1beta1

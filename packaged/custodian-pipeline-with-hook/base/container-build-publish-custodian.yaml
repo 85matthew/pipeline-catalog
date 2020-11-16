@@ -19,7 +19,7 @@ spec:
       default: quay.io/85matthew/custodian
     - name: internal-repository
       type: string
-      default: image-registry.openshift-image-registry.svc:5000/custodian/custodian
+      default: image-registry.openshift-image-registry.svc:5000/custodian-cicd/custodian
 
   tasks:
     - name: clone
