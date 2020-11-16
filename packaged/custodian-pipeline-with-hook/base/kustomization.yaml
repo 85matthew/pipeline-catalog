@@ -47,4 +47,5 @@ resources:
   - container-build-publish-custodian.yaml
   - custodian-task.yaml
   - task-push-image.yaml
+  - condition-master-branch.yaml
 #  - serviceaccount.yaml
