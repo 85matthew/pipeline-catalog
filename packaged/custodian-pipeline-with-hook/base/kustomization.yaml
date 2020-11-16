@@ -46,4 +46,5 @@ resources:
   - serviceaccount.yaml
   - container-build-publish-custodian.yaml
   - custodian-task.yaml
+  - task-push-image.yaml
 #  - serviceaccount.yaml
