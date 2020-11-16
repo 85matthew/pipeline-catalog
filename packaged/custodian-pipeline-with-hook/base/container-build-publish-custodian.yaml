@@ -92,7 +92,27 @@ spec:
         - name: source
           workspace: build-workspace
 
+    - name: publish-tagged-container-to-quay
+      taskRef:
+        kind: Task
+        name: push-image
+      runAfter:
+        - custodian-dry-run
+      params:
+        - name: src-image
+          value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
+        - name: dest-image
+          value: "$(params.quay-repository)"
+        - name: dest-tags
+          value: "$(tasks.generate-gradle-build-id.results.build-id)"
+      workspaces:
+        - name: source
+          workspace: build-workspace
+          
+
     - name: publish-container-to-quay-with-latest-tag
+
+
         #      when:
         #        - input: "$(params.git-repo-branch)"
         #          operator: in
@@ -113,24 +133,7 @@ spec:
           - name: dest-image
             value: "$(params.quay-repository)"
           - name: dest-tags
-            value: "latest"
+            value: "$(tasks.generate-gradle-build-id.results.build-id)"
         workspaces:
           - name: source
             workspace: build-workspace
-
-    - name: publish-tagged-container-to-quay
-      taskRef:
-        kind: Task
-        name: push-image
-      runAfter:
-        - custodian-dry-run
-      params:
-        - name: src-image
-          value: "$(params.internal-repository):$(tasks.generate-gradle-build-id.results.build-id)"
-        - name: dest-image
-          value: "$(params.quay-repository)"
-        - name: dest-tags
-          value: "$(tasks.generate-gradle-build-id.results.build-id)"
-      workspaces:
-        - name: source
-          workspace: build-workspace
