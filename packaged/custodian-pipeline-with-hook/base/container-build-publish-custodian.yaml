@@ -103,7 +103,7 @@ spec:
         kind: Task
         name: push-image
       conditions:
-        - conditionRef: "compare-branch"
+        - conditionRef: "compare-branch-to-master"
           params:
             - name: "branch"
               value: "$(params.git-repo-branch)"
